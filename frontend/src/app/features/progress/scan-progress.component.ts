@@ -18,7 +18,7 @@ export class ScanProgressComponent {
         return `Explaining findings with AI (${enriched}/${totalFindings})`;
       }
       case 'scanning':
-        return 'Scanning with Semgrep…';
+        return 'Scanning your code…';
       default:
         return 'Starting the scanner… (this can take up to 30 seconds after idle)';
     }

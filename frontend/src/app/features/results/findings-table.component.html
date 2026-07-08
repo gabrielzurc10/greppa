@@ -1,12 +1,12 @@
 @if (findings().length === 0) {
   <div class="empty">
     <p class="empty-title">No vulnerabilities found</p>
-    <p class="empty-hint">Semgrep reported no findings for the uploaded files.</p>
+    <p class="empty-hint">The scan reported no findings for the uploaded files.</p>
   </div>
 } @else {
   <ul class="findings">
-    @for (finding of findings(); track finding.id) {
-      <li class="finding">
+    @for (finding of findings(); track finding.id; let i = $index) {
+      <li class="finding" [style.animation-delay.ms]="i < 20 ? i * 45 : 900">
         <details>
           <summary>
             <span class="badge" [class]="'badge severity-' + finding.severity">

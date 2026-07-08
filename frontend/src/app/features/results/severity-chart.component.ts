@@ -8,8 +8,10 @@ import {
   input,
   viewChild,
 } from '@angular/core';
+import { inject } from '@angular/core';
 import { BarController, BarElement, CategoryScale, Chart, LinearScale, Tooltip } from 'chart.js';
 import { ScanSummary, SEVERITY_ORDER, Severity } from '../../core/models';
+import { ThemeService } from '../../core/theme.service';
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
 
@@ -21,14 +23,20 @@ const SEVERITY_LABELS: Record<Severity, string> = {
   info: 'Info',
 };
 
-/** Status palette (light/dark) — severity is a state, not a series; labels carry identity. */
+/**
+ * Status palette per theme — severity is a state, not a series;
+ * the axis labels carry identity, color only reinforces it.
+ */
 const SEVERITY_COLORS: Record<Severity, { light: string; dark: string }> = {
   critical: { light: '#d03b3b', dark: '#d03b3b' },
   high: { light: '#ec835a', dark: '#ec835a' },
   medium: { light: '#fab219', dark: '#fab219' },
-  low: { light: '#2a78d6', dark: '#3987e5' },
-  info: { light: '#898781', dark: '#898781' },
+  low: { light: '#2a78d6', dark: '#4da3ff' },
+  info: { light: '#898781', dark: '#7d8794' },
 };
+
+const MONO_FONT =
+  "'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace";
 
 @Component({
   selector: 'app-severity-chart',
@@ -49,13 +57,13 @@ export class SeverityChartComponent implements AfterViewInit, OnDestroy {
   readonly summary = input.required<ScanSummary>();
 
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
+  private readonly theme = inject(ThemeService);
   private chart: Chart | null = null;
-  private readonly darkQuery = matchMedia('(prefers-color-scheme: dark)');
-  private readonly onSchemeChange = () => this.render();
 
   constructor() {
     effect(() => {
       this.summary();
+      this.theme.resolved();
       if (this.chart) {
         this.render();
       }
@@ -64,20 +72,19 @@ export class SeverityChartComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.render();
-    this.darkQuery.addEventListener('change', this.onSchemeChange);
   }
 
   ngOnDestroy(): void {
-    this.darkQuery.removeEventListener('change', this.onSchemeChange);
     this.chart?.destroy();
   }
 
   private render(): void {
-    const dark = this.darkQuery.matches;
+    const mode = this.theme.resolved();
     const styles = getComputedStyle(document.documentElement);
     const ink = styles.getPropertyValue('--text-primary').trim();
     const muted = styles.getPropertyValue('--text-muted').trim();
     const grid = styles.getPropertyValue('--border').trim();
+    const surface = styles.getPropertyValue('--surface-accent').trim();
     const summary = this.summary();
     const counts = SEVERITY_ORDER.map((s) => summary[s]);
 
@@ -89,7 +96,7 @@ export class SeverityChartComponent implements AfterViewInit, OnDestroy {
         datasets: [
           {
             data: counts,
-            backgroundColor: SEVERITY_ORDER.map((s) => SEVERITY_COLORS[s][dark ? 'dark' : 'light']),
+            backgroundColor: SEVERITY_ORDER.map((s) => SEVERITY_COLORS[s][mode]),
             borderRadius: 4,
             barThickness: 18,
           },
@@ -103,18 +110,26 @@ export class SeverityChartComponent implements AfterViewInit, OnDestroy {
         scales: {
           x: {
             beginAtZero: true,
-            ticks: { precision: 0, color: muted },
+            ticks: { precision: 0, color: muted, font: { family: MONO_FONT, size: 11 } },
             grid: { color: grid },
             border: { display: false },
           },
           y: {
-            ticks: { color: ink, font: { weight: 550 } },
+            ticks: { color: ink, font: { family: MONO_FONT, size: 12, weight: 600 } },
             grid: { display: false },
             border: { display: false },
           },
         },
         plugins: {
           tooltip: {
+            backgroundColor: surface,
+            borderColor: styles.getPropertyValue('--border-strong').trim(),
+            borderWidth: 1,
+            titleColor: ink,
+            bodyColor: ink,
+            titleFont: { family: MONO_FONT },
+            bodyFont: { family: MONO_FONT },
+            displayColors: false,
             callbacks: {
               label: (ctx) => ` ${ctx.parsed.x} finding${ctx.parsed.x === 1 ? '' : 's'}`,
             },
@@ -130,7 +145,7 @@ export class SeverityChartComponent implements AfterViewInit, OnDestroy {
             const meta = chart.getDatasetMeta(0);
             ctx.save();
             ctx.fillStyle = ink;
-            ctx.font = '600 12px system-ui, -apple-system, "Segoe UI", sans-serif';
+            ctx.font = `600 12px ${MONO_FONT}`;
             ctx.textBaseline = 'middle';
             meta.data.forEach((bar, i) => {
               ctx.fillText(String(counts[i]), bar.x + 8, bar.y);

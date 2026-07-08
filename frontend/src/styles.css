@@ -1,33 +1,84 @@
-/* Global theme: light by default, dark via prefers-color-scheme. */
+@import '@fontsource/chakra-petch/700.css';
+
+/*
+ * Global theme, terminal aesthetic with a vibrant blue accent.
+ * Light is the base; dark applies via prefers-color-scheme (system mode)
+ * or an explicit html[data-theme] override set by ThemeService.
+ */
 :root {
-  --surface-page: #f9f9f7;
-  --surface-1: #fcfcfb;
-  --surface-accent: #f0f4fa;
-  --surface-code: #f4f4f1;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
-  --border: #e1e0d9;
-  --border-strong: #c3c2b7;
-  --accent: #2a78d6;
-  --accent-strong: #1c5cab;
-  --critical: #d03b3b;
-  color-scheme: light dark;
+  --surface-page: #f5f7fa;
+  --surface-1: #ffffff;
+  --surface-accent: #eef3f7;
+  --surface-code: #f4f6f9;
+  --text-primary: #0c1520;
+  --text-secondary: #45586a;
+  --text-muted: #71818f;
+  --border: #dfe6ec;
+  --border-strong: #c5d1db;
+  --accent: #00708f;
+  --accent-strong: #0087b3;
+  --accent-dim: rgba(0, 135, 179, 0.1);
+  --on-accent: #ffffff;
+  --critical: #c22f2f;
+  --grid-line: rgba(12, 60, 90, 0.16);
+  --sev-critical: #b42828;
+  --sev-high: #a04d18;
+  --sev-medium: #8a6a00;
+  --sev-low: #1c66c0;
+  --sev-info: #5b6b7a;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas,
+    monospace;
+  --font-display: 'Chakra Petch', var(--font-mono);
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --surface-page: #04070b;
+  --surface-1: #0a1018;
+  --surface-accent: #0d1722;
+  --surface-code: #060b11;
+  --text-primary: #e8f1f8;
+  --text-secondary: #9db0c0;
+  --text-muted: #5f7386;
+  --border: #16222e;
+  --border-strong: #243443;
+  --accent: #00d9ff;
+  --accent-strong: #6ceaff;
+  --accent-dim: rgba(0, 217, 255, 0.12);
+  --on-accent: #04070b;
+  --critical: #ff5d5d;
+  --grid-line: rgba(0, 217, 255, 0.03);
+  --sev-critical: #ff5d5d;
+  --sev-high: #ff9b6b;
+  --sev-medium: #fab219;
+  --sev-low: #4da3ff;
+  --sev-info: #93a4b4;
+  color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --surface-page: #0d0d0d;
-    --surface-1: #1a1a19;
-    --surface-accent: #22262e;
-    --surface-code: #131312;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --border: #2c2c2a;
-    --border-strong: #383835;
-    --accent: #3987e5;
-    --accent-strong: #5598e7;
+  :root:not([data-theme='light']) {
+    --surface-page: #04070b;
+    --surface-1: #0a1018;
+    --surface-accent: #0d1722;
+    --surface-code: #060b11;
+    --text-primary: #e8f1f8;
+    --text-secondary: #9db0c0;
+    --text-muted: #5f7386;
+    --border: #16222e;
+    --border-strong: #243443;
+    --accent: #00d9ff;
+    --accent-strong: #6ceaff;
+    --accent-dim: rgba(0, 217, 255, 0.12);
+    --on-accent: #04070b;
+    --critical: #ff5d5d;
+    --grid-line: rgba(255, 255, 255, 0.5);
+    --sev-critical: #ff5d5d;
+    --sev-high: #ff9b6b;
+    --sev-medium: #fab219;
+    --sev-low: #4da3ff;
+    --sev-info: #93a4b4;
+    color-scheme: dark;
   }
 }
 
@@ -37,8 +88,86 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
   background: var(--surface-page);
   color: var(--text-primary);
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Dot field behind the content: large dots at the bottom shrinking to small
+   ones as they rise, fully faded out by mid-page. Two fixed layers on the same
+   22px grid, each masked to its own vertical band. */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+
+body::before {
+  background-image: radial-gradient(circle, var(--grid-line) 2.5px, transparent 3px);
+  -webkit-mask-image: linear-gradient(to top, black 16%, transparent 36%);
+  mask-image: linear-gradient(to top, black 16%, transparent 36%);
+}
+
+body::after {
+  background-image: radial-gradient(circle, var(--grid-line) 1px, transparent 1.5px);
+  -webkit-mask-image: linear-gradient(
+    to top,
+    transparent 14%,
+    black 28%,
+    black 36%,
+    transparent 52%
+  );
+  mask-image: linear-gradient(to top, transparent 14%, black 28%, black 36%, transparent 52%);
+}
+
+::selection {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* While a scan runs, the dot grid drifts upward like bubbles rising.
+   Moves exactly one tile (22px) per loop so the cycle is seamless. */
+body.scanning::before,
+body.scanning::after {
+  animation: brew 2.4s linear infinite;
+}
+
+@keyframes brew {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 -22px;
+  }
+}
+
+/* Beveled (octagon-like) corners on cards and controls; browsers without
+   corner-shape support keep the rounded fallback from border-radius. */
+.button,
+.badge,
+.dropzone,
+.progress-card,
+.error-card,
+.chart-card,
+.empty,
+.theme-toggle,
+.legal-dialog,
+.finding details {
+  corner-shape: bevel;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
