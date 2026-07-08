@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Greppa.Api/Greppa.Api.csproj" />
+  <Project Path="Greppa.Application/Greppa.Application.csproj" />
+  <Project Path="Greppa.Domain/Greppa.Domain.csproj" />
+  <Project Path="Greppa.Infrastructure/Greppa.Infrastructure.csproj" />
+</Solution>

@@ -1,0 +1,25 @@
+<div
+  class="dropzone"
+  [class.dragging]="dragging()"
+  (drop)="onDrop($event)"
+  (dragover)="onDragOver($event)"
+  (dragleave)="dragging.set(false)"
+>
+  <p class="dropzone-title">Scan your code for vulnerabilities</p>
+  <p class="dropzone-hint">Drop files here, or choose what to upload</p>
+
+  <div class="actions">
+    <label class="button primary">
+      Choose files
+      <input type="file" multiple hidden (change)="onInputChange($event)" />
+    </label>
+    <label class="button">
+      Choose a folder
+      <input type="file" webkitdirectory multiple hidden (change)="onInputChange($event)" />
+    </label>
+  </div>
+
+  <p class="dropzone-fineprint">
+    Up to 200 text files, 1&nbsp;MB each, 50&nbsp;MB total. Dependency folders and lockfiles are skipped.
+  </p>
+</div>

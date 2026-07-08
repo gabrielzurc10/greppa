@@ -1,0 +1,44 @@
+/* Global theme: light by default, dark via prefers-color-scheme. */
+:root {
+  --surface-page: #f9f9f7;
+  --surface-1: #fcfcfb;
+  --surface-accent: #f0f4fa;
+  --surface-code: #f4f4f1;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+  --border: #e1e0d9;
+  --border-strong: #c3c2b7;
+  --accent: #2a78d6;
+  --accent-strong: #1c5cab;
+  --critical: #d03b3b;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface-page: #0d0d0d;
+    --surface-1: #1a1a19;
+    --surface-accent: #22262e;
+    --surface-code: #131312;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --border: #2c2c2a;
+    --border-strong: #383835;
+    --accent: #3987e5;
+    --accent-strong: #5598e7;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,32 @@
+@if (findings().length === 0) {
+  <div class="empty">
+    <p class="empty-title">No vulnerabilities found</p>
+    <p class="empty-hint">Semgrep reported no findings for the uploaded files.</p>
+  </div>
+} @else {
+  <ul class="findings">
+    @for (finding of findings(); track finding.id) {
+      <li class="finding">
+        <details>
+          <summary>
+            <span class="badge" [class]="'badge severity-' + finding.severity">
+              {{ finding.severity }}
+            </span>
+            <span class="location">
+              <code>{{ finding.filePath }}:{{ finding.line }}</code>
+            </span>
+            <span class="rule">{{ finding.ruleId }}</span>
+          </summary>
+          <div class="detail">
+            <h4>Why this matters</h4>
+            <p class="reason">{{ finding.reason }}</p>
+            @if (finding.suggestedFix) {
+              <h4>Suggested fix</h4>
+              <pre class="fix">{{ finding.suggestedFix }}</pre>
+            }
+          </div>
+        </details>
+      </li>
+    }
+  </ul>
+}

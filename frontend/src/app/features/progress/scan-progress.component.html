@@ -1,0 +1,9 @@
+<div class="progress-card" role="status" aria-live="polite">
+  <div class="spinner" aria-hidden="true"></div>
+  <p class="progress-label">{{ label() }}</p>
+  @if (percent() !== null) {
+    <div class="bar-track">
+      <div class="bar-fill" [style.width.%]="percent()"></div>
+    </div>
+  }
+</div>

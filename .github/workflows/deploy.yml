@@ -1,0 +1,102 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write # OIDC token for azure/login and the azurerm provider
+  contents: read
+
+concurrency: deploy
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_USE_OIDC: "true"
+  TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+  TF_VAR_semgrep_app_token: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: terraform init
+
+      # Phase 1: the registry must exist before the image can be pushed.
+      - name: Terraform apply (registry only)
+        run: terraform apply -auto-approve -target=azurerm_container_registry.main
+        env:
+          TF_VAR_image_tag: bootstrap
+
+      - name: Build and push backend image
+        run: |
+          ACR_NAME=$(terraform output -raw acr_name)
+          LOGIN_SERVER=$(terraform output -raw acr_login_server)
+          az acr login --name "$ACR_NAME"
+          docker build -t "$LOGIN_SERVER/greppa-backend:${{ github.sha }}" ../backend
+          docker push "$LOGIN_SERVER/greppa-backend:${{ github.sha }}"
+
+      # Phase 2: everything else, pointing the Container App at the pushed image.
+      - name: Terraform apply (full)
+        run: terraform apply -auto-approve
+        env:
+          TF_VAR_image_tag: ${{ github.sha }}
+
+      - name: Collect Terraform outputs
+        id: tf
+        run: |
+          echo "backend_url=$(terraform output -raw backend_url)" >> "$GITHUB_OUTPUT"
+          SWA_TOKEN=$(terraform output -raw swa_api_key)
+          echo "::add-mask::$SWA_TOKEN"
+          echo "swa_token=$SWA_TOKEN" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npx ng build --configuration production
+          printf '{ "apiBaseUrl": "%s" }\n' "${{ steps.tf.outputs.backend_url }}" \
+            > dist/greppa/browser/config.json
+
+      - name: Deploy frontend to Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ steps.tf.outputs.swa_token }}
+          action: upload
+          app_location: frontend/dist/greppa/browser
+          output_location: ""
+          skip_app_build: true
+          skip_api_build: true
+
+      - name: Summary
+        run: |
+          {
+            echo "### Deployed :rocket:"
+            echo "- Frontend: https://$(terraform output -raw swa_hostname)"
+            echo "- Backend: $(terraform output -raw backend_url)"
+          } >> "$GITHUB_STEP_SUMMARY"

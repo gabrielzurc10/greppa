@@ -1,0 +1,29 @@
+<header class="app-header">
+  <h1>greppa</h1>
+  <p>Vulnerability scanning with Semgrep, explained by AI</p>
+</header>
+
+<main class="app-main">
+  @switch (phase()) {
+    @case ('idle') {
+      <app-upload (filesSelected)="onFilesSelected($event)" />
+    }
+    @case ('running') {
+      <app-scan-progress [job]="job()" />
+    }
+    @case ('done') {
+      <app-results-dashboard [result]="result()!" (newScan)="reset()" />
+    }
+    @case ('error') {
+      <div class="error-card" role="alert">
+        <p class="error-title">Something went wrong</p>
+        <p class="error-message">{{ error() }}</p>
+        <button class="button" type="button" (click)="reset()">Try again</button>
+      </div>
+    }
+  }
+</main>
+
+<footer class="app-footer">
+  Powered by <a href="https://semgrep.dev" rel="noopener">Semgrep</a> + GPT-5-mini
+</footer>

@@ -1,0 +1,21 @@
+<div class="results-header">
+  <div>
+    <h2>Scan results</h2>
+    <p class="subtitle">
+      {{ result().summary.total }} finding{{ result().summary.total === 1 ? '' : 's' }}
+      across {{ result().summary.filesScanned }} file{{ result().summary.filesScanned === 1 ? '' : 's' }}
+    </p>
+  </div>
+  <button class="button" type="button" (click)="newScan.emit()">New scan</button>
+</div>
+
+@if (result().summary.total > 0) {
+  <section class="chart-card" aria-label="Findings by severity">
+    <h3>Findings by severity</h3>
+    <app-severity-chart [summary]="result().summary" />
+  </section>
+}
+
+<section aria-label="Findings list">
+  <app-findings-table [findings]="result().findings" />
+</section>

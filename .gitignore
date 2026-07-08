@@ -1,0 +1,30 @@
+# Secrets
+.env
+*.tfvars
+!*.tfvars.example
+
+# .NET
+bin/
+obj/
+*.user
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+
+# Terraform (keep .terraform.lock.hcl committed)
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+terraform.rc
+
+# Local scan samples
+samples/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

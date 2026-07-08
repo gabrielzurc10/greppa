@@ -1,0 +1,68 @@
+:host {
+  display: block;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.app-header p {
+  margin: 0.35rem 0 0;
+  color: var(--text-secondary);
+}
+
+.error-card {
+  background: var(--surface-1);
+  border: 1px solid var(--critical);
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.error-title {
+  font-weight: 650;
+  margin: 0 0 0.35rem;
+  color: var(--critical);
+}
+
+.error-message {
+  margin: 0 0 1.25rem;
+  color: var(--text-secondary);
+}
+
+.button {
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--surface-accent);
+}
+
+.app-footer {
+  margin-top: 3rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.app-footer a {
+  color: inherit;
+}
