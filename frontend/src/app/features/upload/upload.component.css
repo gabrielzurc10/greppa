@@ -1,15 +1,11 @@
 .dropzone {
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 3rem 2rem;
   text-align: center;
   background: var(--surface-1);
   animation: rise 0.5s ease 0.08s backwards;
   transition: border-color 0.25s ease, background 0.2s ease;
-}
-
-.dropzone:hover {
-  border-color: var(--accent);
 }
 
 .dropzone.dragging {
@@ -41,31 +37,27 @@
   display: inline-block;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
-  border: 1px solid var(--border-strong);
-  background: var(--surface-1);
+  border: none;
+  background: var(--border);
   color: var(--text-primary);
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .button:hover {
-  border-color: var(--accent);
-  background: var(--accent-dim);
-  transform: translateY(-1px);
+  background: var(--border-strong);
 }
 
 .button.primary {
   background: var(--accent);
-  border-color: var(--accent);
   color: var(--on-accent);
 }
 
 .button.primary:hover {
   background: var(--accent-strong);
-  border-color: var(--accent-strong);
 }
 
 .dropzone-fineprint {

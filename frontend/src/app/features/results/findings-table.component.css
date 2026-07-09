@@ -15,15 +15,25 @@
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: 10px;
-  transition: border-color 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .finding details:hover {
-  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
 }
 
-.finding details[open] {
-  border-color: var(--accent);
+/* Animate expand/collapse of the native <details>. Needs `interpolate-size:
+   allow-keywords` (set on :root) to transition to block-size: auto; browsers
+   without support snap open/closed as before. */
+.finding details::details-content {
+  block-size: 0;
+  overflow-y: clip;
+  transition: block-size 0.3s ease, content-visibility 0.3s allow-discrete;
+}
+
+.finding details[open]::details-content {
+  block-size: auto;
 }
 
 .finding summary {
@@ -108,8 +118,7 @@
 .fix {
   margin: 0;
   padding: 0.85rem 1rem;
-  background: var(--surface-code);
-  border: 1px solid var(--border);
+  background: var(--surface-accent);
   border-radius: 8px;
   overflow-x: auto;
   font-family: var(--font-mono);
@@ -121,7 +130,7 @@
 
 .empty {
   background: var(--surface-1);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2.5rem 2rem;
   text-align: center;
@@ -136,8 +145,9 @@
 }
 
 .empty-title::before {
-  content: '✓ ';
-  color: var(--accent);
+  content: '[ok] ';
+  font-family: var(--font-mono);
+  color: var(--success);
 }
 
 .empty-hint {

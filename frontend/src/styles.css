@@ -20,7 +20,12 @@
   --accent-dim: rgba(0, 135, 179, 0.1);
   --on-accent: #ffffff;
   --critical: #c22f2f;
-  --grid-line: rgba(12, 60, 90, 0.16);
+  --success: #1a7f37;
+  --grid-line: rgba(12, 60, 90, 0.06);
+  --shadow-card: 0 1px 3px rgba(12, 21, 32, 0.05), 0 8px 24px rgba(12, 21, 32, 0.07);
+  --shadow-card-hover: 0 2px 6px rgba(12, 21, 32, 0.08), 0 14px 34px rgba(12, 21, 32, 0.12);
+  /* Lets block-size animate to/from `auto` (details expand/collapse). */
+  interpolate-size: allow-keywords;
   --sev-critical: #b42828;
   --sev-high: #a04d18;
   --sev-medium: #8a6a00;
@@ -33,21 +38,24 @@
 }
 
 :root[data-theme='dark'] {
-  --surface-page: #04070b;
-  --surface-1: #0a1018;
-  --surface-accent: #0d1722;
-  --surface-code: #060b11;
+  --surface-page: #0d141d;
+  --surface-1: #141d28;
+  --surface-accent: #182430;
+  --surface-code: #0f1720;
   --text-primary: #e8f1f8;
   --text-secondary: #9db0c0;
   --text-muted: #5f7386;
-  --border: #16222e;
-  --border-strong: #243443;
+  --border: #223140;
+  --border-strong: #33475a;
   --accent: #00d9ff;
   --accent-strong: #6ceaff;
   --accent-dim: rgba(0, 217, 255, 0.12);
-  --on-accent: #04070b;
+  --on-accent: #0d141d;
   --critical: #ff5d5d;
+  --success: #3fb950;
   --grid-line: rgba(0, 217, 255, 0.03);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 2px 6px rgba(0, 0, 0, 0.35), 0 14px 34px rgba(0, 0, 0, 0.45);
   --sev-critical: #ff5d5d;
   --sev-high: #ff9b6b;
   --sev-medium: #fab219;
@@ -58,21 +66,24 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --surface-page: #04070b;
-    --surface-1: #0a1018;
-    --surface-accent: #0d1722;
-    --surface-code: #060b11;
+    --surface-page: #0d141d;
+    --surface-1: #141d28;
+    --surface-accent: #182430;
+    --surface-code: #0f1720;
     --text-primary: #e8f1f8;
     --text-secondary: #9db0c0;
     --text-muted: #5f7386;
-    --border: #16222e;
-    --border-strong: #243443;
+    --border: #223140;
+    --border-strong: #33475a;
     --accent: #00d9ff;
     --accent-strong: #6ceaff;
     --accent-dim: rgba(0, 217, 255, 0.12);
-    --on-accent: #04070b;
+    --on-accent: #0d141d;
     --critical: #ff5d5d;
-    --grid-line: rgba(255, 255, 255, 0.5);
+    --success: #3fb950;
+    --grid-line: rgba(0, 217, 255, 0.03);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.3);
+    --shadow-card-hover: 0 2px 6px rgba(0, 0, 0, 0.35), 0 14px 34px rgba(0, 0, 0, 0.45);
     --sev-critical: #ff5d5d;
     --sev-high: #ff9b6b;
     --sev-medium: #fab219;
@@ -131,6 +142,41 @@ body::after {
   color: var(--accent);
 }
 
+/* Custom scrollbars, themed with the surface/border tokens. Chromium and
+   Safari take the rich ::-webkit-scrollbar styling; Firefox (no support for
+   that pseudo-element) falls back to the standard two-color properties. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  /* Transparent rim so the thumb floats off the page edge. */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+}
+
 /* While a scan runs, the dot grid drifts upward like bubbles rising.
    Moves exactly one tile (22px) per loop so the cycle is seamless. */
 body.scanning::before,
@@ -158,8 +204,21 @@ body.scanning::after {
 .empty,
 .theme-toggle,
 .legal-dialog,
-.finding details {
+.finding details,
+.finding .fix {
   corner-shape: bevel;
+}
+
+/* Soft elevation shared by all card surfaces and raised controls. */
+.dropzone,
+.progress-card,
+.error-card,
+.chart-card,
+.empty,
+.finding details,
+.button,
+.theme-toggle {
+  box-shadow: var(--shadow-card);
 }
 
 @media (prefers-reduced-motion: reduce) {

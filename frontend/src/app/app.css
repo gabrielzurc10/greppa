@@ -1,23 +1,33 @@
 :host {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
   max-width: 880px;
   margin: 0 auto;
-  padding: 2.5rem 1.25rem 4rem;
+  padding: 2.5rem 1.25rem 2rem;
 }
 
-.app-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
+.app-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
   animation: rise 0.5s ease backwards;
 }
 
-.theme-toggle {
-  position: absolute;
-  top: 1rem;
-  right: 1.25rem;
+.app-main {
+  flex: 1;
   display: flex;
-  border: 1px solid var(--border-strong);
+  flex-direction: column;
+  justify-content: center;
+  /* Bias the centered content upward; optically centered looks better than exact. */
+  padding-bottom: 18vh;
+}
+
+.theme-toggle {
+  display: flex;
+  border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
   background: var(--surface-1);
@@ -43,38 +53,30 @@
   color: var(--accent);
 }
 
-.app-header h1 {
+.brand {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
+  gap: 0.45rem;
   margin: 0;
   font-family: var(--font-display);
-  font-size: 2.2rem;
+  font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--text-primary);
 }
 
 .logo {
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 1.5rem;
+  height: 1.5rem;
   color: var(--accent);
   flex-shrink: 0;
 }
 
-.app-header h1::after {
+.brand::after {
   content: '▍';
   margin-left: 0.05em;
   color: var(--accent);
   animation: blink 1.1s steps(1) infinite;
-}
-
-.app-header p {
-  margin: 0.5rem 0 0;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-secondary);
 }
 
 .error-card {
@@ -94,7 +96,8 @@
 }
 
 .error-title::before {
-  content: '✗ ';
+  content: '[!] ';
+  font-family: var(--font-mono);
 }
 
 .error-message {
@@ -105,23 +108,23 @@
 .button {
   padding: 0.55rem 1.1rem;
   border-radius: 8px;
-  border: 1px solid var(--border-strong);
-  background: var(--surface-1);
+  border: none;
+  background: var(--border);
   color: var(--text-primary);
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .button:hover {
-  border-color: var(--accent);
-  background: var(--accent-dim);
+  background: var(--border-strong);
 }
 
 .app-footer {
-  margin-top: 3rem;
+  margin-top: auto;
+  padding-top: 3rem;
   text-align: center;
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -174,7 +177,7 @@
   padding: 1.5rem 1.75rem;
   background: var(--surface-1);
   color: var(--text-primary);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: 12px;
 }
 

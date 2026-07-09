@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
+import { collectDroppedFiles } from '../../core/upload-filter';
 
 @Component({
   selector: 'app-upload',
@@ -18,12 +19,20 @@ export class UploadComponent {
     }
   }
 
-  protected onDrop(event: DragEvent): void {
+  protected async onDrop(event: DragEvent): Promise<void> {
     event.preventDefault();
     this.dragging.set(false);
-    const files = event.dataTransfer?.files;
-    if (files?.length) {
-      this.filesSelected.emit(Array.from(files));
+    const transfer = event.dataTransfer;
+    if (!transfer) {
+      return;
+    }
+    // Snapshot the plain file list synchronously — the DataTransfer is not
+    // readable after the handler yields.
+    const plainFiles = Array.from(transfer.files);
+    const files = transfer.items?.length ? await collectDroppedFiles(transfer.items) : plainFiles;
+    const selected = files.length ? files : plainFiles;
+    if (selected.length) {
+      this.filesSelected.emit(selected);
     }
   }
 
